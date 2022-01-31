@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="lib/css/bootstrap.css">
+        <link rel="stylesheet" href="lib/css/bootstrap-datepicker.css">
+        <link rel="stylesheet" href="css/index.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+        <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:">
+        <title>Stable Manager</title>
+    </head>
+    <body>
+
+      <div class="modal fade" id="DisableModal">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Are you sure?</h5>
+              <button type="button" class="backToAdminButton btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p> Confirming will mark all timeslots on <b><span class="disableDate"></span></b> as unavailible! </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="disButton" class="btn btn-danger">Confirm</button>
+          <button type="button" class="btn backToAdminButton btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="pleaseLoginModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">You are not currently logged in</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><h6> please <button type="button" class="btn btn-primary openLoginButton"><span id="displayedName">Login</span> </button> to make, edit or cancel a reservation </p></h6>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+  </div>
+</div>
+</div>
+
+  <div class="modal fade" id="cancelReservationAdminModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Cancel the <b><span class="cancelDate"></span></b> reservation?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <button type="button" class="btn btn-secondary" id="editButton" data-bs-dismiss="modal">Edit</button>
+          <button type="button" id="canResButton" class="btn btn-primary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="modal fade" id="ReservationModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Timeslot selected: <b><span class="timeslotId" id="timeslotId"></span></b></h5>
+        <button type="button" class="btnResClose btn-close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-8">
+              <label for="inputName" class="form-label">Name:</label>
+              <input type="text" id="inputName" placeholder="Józef Piłsudski" class="form-control"></input>
+              <div class="invalid-feedback">The name can't be longer than 8 characters</div>
+              <div style="height:1vw"></div>
+              <label for="inputHorse" class="form-label">Horse:</label>
+              <input type="text" id="inputHorse" placeholder="Kasztanka" class="form-control"></input>
+              <div class="invalid-feedback">The name can't be longer than 8 characters</div>
+              <div style="height:1vw"></div>
+              <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="switchRecurrent">
+                  <label class="form-check-label" for="flexSwitchCheckDefualt">Repeat every week</label>
+                </div>
+          </div>
+          <div class="col-4">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="trainingOptions" id="trainingOption1" value="Dressage">
+              <label class="form-check-label" for="trainingOption3">Dressage</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="trainingOptions" id="trainingOption2"  value="Jumping">
+            <label class="form-check-label" for="trainingOption3">Jumping</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="trainingOptions" id="trainingOption3" value="Western">
+          <label class="form-check-label" for="trainingOption3">Western</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="trainingOptions" id="trainingOption4" value="Lunge">
+        <label class="form-check-label" for="trainingOption4">Lunge</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="trainingOptions" id="trainingOption5" value="Free-Horse">
+      <label class="form-check-label" for="trainingOption5">Free Horse</label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="trainingOptions" id="trainingOption6" value="Vaulting">
+    <label class="form-check-label" for="trainingOption6">Vaulting</label>
+</div>
+        </div>
+        </div>
+      </div>
+      <div class="modal-footer" content-align:"center">
+        <button type="button" id="resButton" class="btn btn-primary">Reserve</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="adminGateModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Input admin password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <label for="adminPasswordInput" class="form-label">Password</label>
+        <input type="password" class="form-control" id="adminPasswordInput" placeholder="********">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="confirmAdminPassword" class="btn btn-primary" data-bs-dismiss="modal">Enter</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="changePasswordModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Change Admin Password</h5>
+        <button type="button" class="btn-close backToAdminButton" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <label for="oldAdminPasswordInput" class="form-label">Old Password</label>
+        <input type="password" class="form-control" id="oldAdminPasswordInput" placeholder="********">
+
+        <label for="newAdminPasswordInput" class="form-label">New Password</label>
+        <input type="password" class="form-control" id="newAdminPasswordInput" placeholder="********">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="confirmChangeAdminPassword" class="btn btn-primary" data-bs-dismiss="modal">Confirm</button>
+        <button type="button" class="btn btn-secondary backToAdminButton" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="announcementChangeModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Input the new announcement</h5>
+        <button type="button" class="btn-close backToAdminButton" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <label for="announcementInput" class="form-label">Announcement:</label>
+        <textarea class="form-control" id="announcementInput" rows="3"></textarea>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="confirmAnnouncementChange" class="btn btn-primary" data-bs-dismiss="modal">Confirm</button>
+        <button type="button" class="btn btn-secondary backToAdminButton" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="controlPanelModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Admin Control Panel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <div class="btn-group" role="group">
+            <button type="button" id="disableButton" class="btn btn-danger">Disable current day</button>
+            <button type="button" id="announcementChangeButton" class="btn btn-primary">Modify the announcement</button>
+            <button type="button" id="passwordChangeButton" class="btn btn-info">Change admin password</button>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="loginModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Login</h5>
+         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+        <div class="row">
+          <p>
+          <label for="emailInputLogin" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="emailInputLogin" placeholder="name@example.com">
+        </p>
+        </div>
+        <div class="row">
+            <p>
+          <label for="passwordInputLogin" class="form-label">Password</label>
+          <input type="password" class="form-control" id="passwordInputLogin" placeholder="********">
+        </p>
+        </div>
+        <div class="row">
+            <p>
+          <span id="errorCodeLogin"></span>
+        </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="openRegisterModalButton" class="btn btn-secondary">Register</button>
+        <button type="button" id="confirmLoginButton" class="btn btn-primary">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="registerModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Register</h5>
+         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <p>
+          <label for="nameInputRegister" class="form-label">Name:</label>
+          <input type="text" class="form-control" id="nameInputRegister" placeholder="John">
+        </p>
+        <div class="row">
+          <p>
+          <label for="emailInputRegister" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="emailInputRegister" placeholder="name@example.com">
+        </p>
+        </div>
+        <div class="row">
+            <p>
+          <label for="passwordInputRegister" class="form-label">Password</label>
+          <input type="password" class="form-control" id="passwordInputRegister" placeholder="********">
+        </p>
+        </div>
+        <div class="row">
+            <p>
+          <span id="errorCodeRegister"></span>
+        </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary openLoginButton">Login</button>
+        <button type="button" id="confirmRegisterButton" class="btn btn-primary">Register</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="modal fade" id="userPanelModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Hello <span id="userGreetings"></span>!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body content-justify-center">
+        <div class="row"><button type="button" id="changeDisplayNameButton" class="btn-success btn">Change your name</button></div>
+        <div class="collapse" id="changeName">
+          <div class="card card-body">
+            <div class="row">
+              <div class="row align-content-end">
+                <p><div class="col">
+                <input type="text" class="form-control" id="newNameInput" placeholder="New Name">
+              </div>
+              <div class="col"><button type="button" id="confirmChangeNameButton" class="btn-success btn">Confirm</button></div>
+              </p>
+            </div>
+        </div>
+      </div>
+
+    </div>
+        <div class="row"><button type="button" id="viewWeeklyDaysButton" class="btn-success btn" disabled>View recurring reservations</button></div>
+        <div class="row"><button type="button" id="deleteAccountButton" class="btn-danger btn">Delete Account</button></div>
+        <div class="collapse" id="areYouSureDelete">
+          <div class="card card-body">
+            <div class="row">
+            <h6>Are you sure you want to delete your account?</h6>
+            <div>
+              <div class="row justify-content-center">
+            <div class="col-4 justify-content-center"><button type="button" id="noDelete" class="btn-secondary btn">No</button></div>
+            <div class="col-4 justify-content-center"><button type="button" id="yesDelete" class="btn-danger btn">Yes</button></div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" id="signOutButton" class="btn-secondary btn">Sign out</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="container">
+    <div class="row break-row"></div>
+  <div class="row d-flex justify-content-center">
+
+  <div class="col-9" id="datepicker" ><div class="input-group date"><input type="text" id="inputDatepicker" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span></div></div>
+
+
+  <div class="col-3" ><button type="button" class="btn btn-primary openLoginButton"> <i class="bi bi-person-circle"> </i><span id="displayName"></span> </button> </div>
+</div>
+<div class="row">
+  <div class="col-3"></div>
+  <div class="col" ><button id="previousprevious" type="button" class="btn btn-info"> <<- </button></div>
+  <div class="col" ><button id="previous" type="button" class="btn btn-info"> <- </button></div>
+  <div class="col" ><button id="adminGateButton" type"button" class="btn btn-danger"><i class="bi bi-shield-lock"></i></button></div>
+  <div class="col" ><button id="next" type="button" class="btn btn-info"> -> </button></div>
+  <div class="col" ><button id="nextnext" type="button" class="btn btn-info"> ->> </button></div>
+  <div class="col-3"></div>
+</div>
+<div class="container">
+<div class="row break-row"></div>
+
+<div class="row timeslot-row d-flex justify-content-around flex.wrap">
+  <div class="col-3">
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="8:00 - 9:00" id="ts1">8:00 - 9:00</p></button></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="9:00 - 10:00" id="ts2">9:00 - 10:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="10:00 - 11:00" id="ts3">10:00 - 11:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="11:00 - 12:00" id="ts4">11:00 - 12:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="12:00 - 13:00" id="ts5">12:00 - 13:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="13:00 - 14:00" id="ts6">13:00 - 14:00</button></p></div>
+  </div>
+  <div class="col-3">
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="14:00 - 15:00" id="ts7">14:00 - 15:00</p></button></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="15:00 - 16:00" id="ts8">15:00 - 16:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="16:00 - 17:00" id="ts9">16:00 - 17:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="17:00 - 18:00" id="ts10">17:00 - 18:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="18:00 - 19:00" id="ts11">18:00 - 19:00</button></p></div>
+    <div class="col-3"><p><button type="button" class="btn btn-type btn-lg timeslot-button" name="19:00 - 20:00" id="ts12">19:00 - 20:00</button></p></div>
+  </div>
+</div>
+</div>
+<div class="row">
+<div class="col"><span class="badge bg-warning rounded-pill">New Announcement!</span></div>
+<div class="row">
+  <div class="col">
+    <div class="bd-callout bd-callout-info d-flex justify-content-evenly" style="background-color:white">
+      <button type="button" class="btn btn-primary">Dressage</button>
+      <button type="button" class="btn btn-success">Jumping</button>
+      <button type="button" class="btn btn-warning">Western</button>
+      <button type="button" class="btn btn-secondary">Lunge</button>
+      <button type="button" class="btn btn-info">Free Horse</button>
+      <button type="button" class="btn btn-danger">Vaulting</button>
+      <button type="button" class="btn btn-dark">Unavailible</button>
+    </div>
+    <div class="bd-callout bd-callout-info d-flex justify-content-evenly" style="background-color:white"><h4>Announcement: <span id="announcement"></h4></span></div>
+</div>
+</div>
+        <script src="lib/js/jQuery/jQuery.js"></script>
+        <script src="cordova.js"></script>
+        <script src="lib/js/bootstrap.bundle.js"></script>
+        <script src="lib/js/bootstrap-datepicker.js"></script>
+        <script type="module" src="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.2.2/firebase-app.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.0/firebase-ui-auth.css" />
+        <script src="js/index.js" type="module"></script>
+
+    </body>
+</html>
