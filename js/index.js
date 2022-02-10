@@ -20,6 +20,7 @@ import {
     set,
     onValue,
     get,
+    off,
 } from "https://www.gstatic.com/firebasejs/9.6.2/firebase-database.js";
 
 
@@ -45,6 +46,8 @@ const auth = getAuth(app)
 
 var uid = null;
 var loggedInUser = null;
+var onValueList = {}
+var onValueListWeek = {}
 
 onAuthStateChanged(auth, (user) => {
   if(user){
@@ -102,7 +105,6 @@ const createAccount = async () => {
   }
 }
 }
-
 
 $('#datepicker .input-group.date').datepicker({
     format: "mm/dd/yyyy",
@@ -300,6 +302,8 @@ function confirmDisable() {
     trackDay()
 }
 
+var datedDate = null
+
 function confirmReservation() {
     let dat = {
         "Name": $("#inputName").val(),
@@ -312,8 +316,17 @@ function confirmReservation() {
     let timeslot = $("#timeslotId").html()
     let date = $("#datepicker input").val().replaceAll("/", "-")
 
-    const loc = ref(db, (`day/${date}/${timeslot}`))
-    set(loc, dat)
+    datedDate = new Date($("#datepicker input").val())
+    let weekDay = datedDate.getDay()
+
+    if(document.getElementById("switchRecurrent").checked){
+    const loca = ref(db, (`repeatingDays/${weekDay}/${timeslot}`))
+    set(loca, dat)
+    } else {
+    const loca = ref(db, (`day/${date}/${timeslot}`))
+    set(loca, dat)
+  }
+
     trackDay()
 }
 
@@ -321,8 +334,13 @@ function cancelReservation(){
   canResAdminModal.hide()
   let timeslot = $(".cancelDate").html()
   let date = $("#datepicker input").val().replaceAll("/", "-")
+  let date2 = new Date($("#datepicker input").val())
+  let weekDay = date2.getDay()
+  const locWeek = ref(db, (`repeatingDays/${weekDay}/${timeslot}`))
   const loc = ref(db, (`day/${date}/${timeslot}`))
   set(loc,null)
+  set(locWeek,null)
+  trackDay()
 }
 
 function showModalAdminGate(e) {
@@ -332,7 +350,7 @@ function showModalAdminGate(e) {
   controlPanelModal.show()
   }
 }
-
+var uidReRef = null
 function showModalRes(e) {
   if(loggedInUser){
   if(e.target.classList.contains('btn-light')){
@@ -345,11 +363,22 @@ function showModalRes(e) {
   } else {
     let hour = parseInt(e.target.id.slice(2))+7
     let date = $("#datepicker input").val().replaceAll("/", "-")
+    let weekDay = new Date($("#datepicker input").val()).getDay()
 
     console.log(hour)
     uidRef = ref(db, "day/"+date+"/"+hour+":00 - "+(hour+1)+":00/uid")
+    uidReRef = ref(db, "repeatingDays/"+weekDay+"/"+hour+":00 - "+(hour+1)+":00/uid")
     onValue(uidRef, (snapshot) =>{
     if(snapshot.val() == auth.currentUser.uid){
+      console.log("UID Matches")
+      $(".cancelDate").html(e.target.name)
+      canResAdminModal.show()
+    }
+  })
+
+  onValue(uidReRef, (snapshot) =>{
+    if(snapshot.val() == auth.currentUser.uid){
+      console.log("UID Matches")
       $(".cancelDate").html(e.target.name)
       canResAdminModal.show()
     }
@@ -372,6 +401,7 @@ function closeDisable() {
 function changeDate(increment) {
     let dateCurrent = $("#datepicker input").val();
     let dateNew = new Date(dateCurrent);
+
     if (dateCurrent == "") {
         dateNew = new Date();
     }
@@ -390,64 +420,54 @@ onValue(loc, (snapshot) => {
     onlyOnce: true
 });
 
-var horseRef = null
-var nameRef = null
-var typeRef = null
 var uidRef = null
-var weekDayRef = null
 var announcementRef = ref(db, "Announcement")
 
 onValue(announcementRef, (snapshot) => {
   $("#announcement").html(snapshot.val())
 })
-//trackDay()
+
+
+
+const typeColors = {"Jumping": "btn-success", "Unavailible": "btn-dark", "Dressage": "btn-primary", "Western": "btn-warning", "Lunge": "btn-secondary", "Free-Horse":"btn-info", "Vaulting":"btn-danger"}
+
 function trackDay() {
     let date = $("#datepicker input").val().replaceAll("/", "-")
     for (let hour = 8; hour < 20; hour++) {
-        typeRef = ref(db, "day/" + date + "/" + hour + ":00 - " + (hour + 1) + ":00/Type")
-        nameRef = ref(db, "day/" + date + "/" + hour + ":00 - " + (hour + 1) + ":00/Name")
-        horseRef = ref(db, "day/" + date + "/" + hour + ":00 - " + (hour + 1) + ":00/Horse")
 
+      document.querySelector(`#ts${hour-7}`).classList.remove("btn-dark","btn-primary","btn-success","btn-warning","btn-secondary","btn-info","btn-danger","btn-light")
+      $(`#ts${hour-7}`).html(hour + ":00 - " + (hour + 1) + ":00")
+      document.querySelector(`#ts${hour-7}`).classList.add("btn-light")
 
-        onValue(nameRef, (snapshot) => {
-         if (snapshot.val() != null){
-           $(`#ts${hour-7}`).html(snapshot.val())
-         }
-})
+      let dateNew = new Date($("#datepicker input").val())
+      let weekDay = dateNew.getDay()
 
-        onValue(horseRef, (snapshot) => {
-         if (snapshot.val() != null){
-           $(`#ts${hour-7}`).html(`${$(`#ts${hour-7}`).text()} (${snapshot.val()})`)
-         }
-})
+      let weekDayRef = ref(db, "repeatingDays/"+weekDay+"/"+hour+":00 - "+(hour + 1) + ":00")
+      if (onValueListWeek[hour-8]){
+        off(onValueListWeek[hour-8])
+      }
+      onValueListWeek[hour-8] = weekDayRef
+      onValue(weekDayRef, updateButton(hour))
+      let  dayLoc = ref(db, "day/" + date + "/" + hour + ":00 - " + (hour + 1) + ":00")
+      if (onValueList[hour-8]){
+        off(onValueList[hour-8])
+      }
 
-        onValue(typeRef, (snapshot) => {
-            const Type = snapshot.val();
-            document.querySelector(`#ts${hour-7}`).classList.remove("btn-dark","btn-primary","btn-success","btn-warning","btn-secondary","btn-info","btn-danger","btn-light")
-            document.querySelector(`#ts${hour-7}`).classList.remove("Dressage","Jumping","Western","Lunge","Free-Horse","Vaulting","Unavailible")
-            if (snapshot.val() == null) {
-                $(`#ts${hour-7}`).html(hour + ":00 - " + (hour + 1) + ":00")
-            } else {
-                document.querySelector(`#ts${hour-7}`).classList.add(Type);
-            }
-
-            if (document.querySelector(`#ts${hour-7}`).classList.contains("Unavailible")) {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-dark")
-            } else if(document.querySelector(`#ts${hour-7}`).classList.contains("Dressage")) {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-primary")
-            } else if(document.querySelector(`#ts${hour-7}`).classList.contains("Jumping")) {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-success")
-            } else if(document.querySelector(`#ts${hour-7}`).classList.contains("Western")) {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-warning")
-            } else if(document.querySelector(`#ts${hour-7}`).classList.contains("Lunge")) {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-secondary")
-            } else if(document.querySelector(`#ts${hour-7}`).classList.contains("Free-Horse")) {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-info")
-            } else if(document.querySelector(`#ts${hour-7}`).classList.contains("Vaulting")) {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-danger")
-            } else {
-              document.querySelector(`#ts${hour-7}`).classList.add("btn-light")
-            }
-        })
+        onValueList[hour-8] = dayLoc
+        onValue(dayLoc, updateButton(hour))
     }
+}
+
+function updateButton(hour) {
+  return (snapshot) => {
+    let snapVal = snapshot.val()
+
+    if (snapVal == null ||snapVal.Name == null ||snapVal.Type == null ||snapVal.Horse == null){
+      return
+    }
+
+      document.querySelector(`#ts${hour-7}`).classList.remove("btn-dark","btn-primary","btn-success","btn-warning","btn-secondary","btn-info","btn-danger","btn-light")
+      $(`#ts${hour-7}`).html(`${snapVal.Name} (${snapVal.Horse})`)
+      document.querySelector(`#ts${hour-7}`).classList.add(typeColors[snapVal.Type]);
+  }
 }
