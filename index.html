@@ -58,7 +58,7 @@
         </div>
         <div class="modal-body">
           <p>
-          <h6> please <button type="button" class="btn btn-primary openLoginButton"><span id="displayedName">Login</span> </button> to make, edit or cancel a reservation </p>
+          <h6> please <button type="button" class="btn btn-primary openLoginButton"><span id="displayedName">Login</span> </button> to make or cancel a reservation </p>
           </h6>
         </div>
         <div class="modal-footer">
@@ -76,7 +76,6 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <button type="button" class="btn btn-secondary" id="editButton" data-bs-dismiss="modal">Edit</button>
           <button type="button" id="canResButton" class="btn btn-primary">Cancel</button>
         </div>
       </div>
@@ -334,7 +333,6 @@
             </div>
 
           </div>
-          <div class="row"><button type="button" id="viewWeeklyDaysButton" class="btn-success btn" disabled>View recurring reservations</button></div>
           <div class="row"><button type="button" id="deleteAccountButton" class="btn-danger btn">Delete Account</button></div>
           <div class="collapse" id="areYouSureDelete">
             <div class="card card-body">
@@ -357,6 +355,75 @@
       </div>
     </div>
   </div>
+
+<div class="modal fade" id="recurringReservationsModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Recurring Reservations:</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            Monday
+          </div>
+          <div class="col">
+            <span id="recurring0"></span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            Tuesday
+          </div>
+          <div class="col">
+            <span id="recurring1"></span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            Wednesday
+          </div>
+          <div class="col">
+            <span id="recurring2"></span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            Thursday
+          </div>
+          <div class="col">
+            <span id="recurring3"></span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            Friday
+          </div>
+          <div class="col">
+            <span id="recurring4"></span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            Saturday
+          </div>
+          <div class="col">
+            <span id="recurring5"></span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            Sunday
+          </div>
+          <div class="col">
+            <span id="recurring6"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
   <div class="container">
     <div class="row break-row"></div>
